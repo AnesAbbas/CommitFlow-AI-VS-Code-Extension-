@@ -1,8 +1,5 @@
-Yes. I’d make this a **standalone extension**, separate from Task Logger, because the functionality is useful for any VS Code project.
 
-## Recommended name: **CommitFlow AI**
-
-It communicates the whole workflow rather than just “AI commit message”:
+## **CommitFlow AI**
 
 > **CommitFlow AI — Smart Git Sync & AI Commit Messages**
 
@@ -1072,33 +1069,8 @@ That would make the large-change commit messages substantially better.
 
 ---
 
-# 14. I would also add a "dry run" mode
 
-Before automatically committing, the extension could have:
-
-```text
-CommitFlow AI
-
-Generated commit message:
-
-feat: add OpenRouter commit generation
-
-[Commit & Push] [Commit Only] [Regenerate] [Cancel]
-```
-
-This is much safer than your original:
-
-```powershell
-git add .
-git commit -m "-"
-git push
-```
-
-And the **Regenerate** button could call OpenRouter again with the same analysis.
-
----
-
-# 15. One important security point
+# 14. One important security point
 
 Do **not** put your key in:
 
@@ -1127,7 +1099,7 @@ sk-or-v1-...
 
 ---
 
-# 16. What the finished product feels like
+# 15. What the finished product feels like
 
 The user opens any Git repository.
 
@@ -1168,11 +1140,3 @@ Then:
 ✓ Commit created
 ✓ Changes pushed
 ```
-
-That is a **much stronger standalone Marketplace product** than simply packaging your original `tasks.json`.
-
-### One architectural change I'd strongly recommend
-
-For the **final Marketplace version**, I would make the default behavior **not blindly `git add .`**. Instead, default to **already-staged changes**, with an optional `autoStageAll` setting. That prevents an accidental `Ctrl+Alt+S` from committing unrelated files such as secrets, `.env` files, temporary work, or unfinished changes.
-
-Also, I would rename the setting prefix from `commitflow-ai` to whatever final extension identifier you register, because VS Code configuration keys should remain stable once published.
