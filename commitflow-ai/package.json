@@ -1,0 +1,112 @@
+{
+  "name": "commitflow-ai",
+  "displayName": "CommitFlow AI",
+  "description": "AI-powered Git sync with smart commit messages using OpenRouter",
+  "version": "0.0.1",
+  "publisher": "your-publisher-name",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "SCM",
+    "Machine Learning"
+  ],
+  "keywords": [
+    "git",
+    "commit",
+    "commit message",
+    "ai",
+    "openrouter",
+    "git sync",
+    "automation",
+    "productivity"
+  ],
+  "activationEvents": [
+    "onCommand:commitflow-ai.sync"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "commitflow-ai.sync",
+        "title": "CommitFlow AI: Sync Changes"
+      },
+      {
+        "command": "commitflow-ai.setApiKey",
+        "title": "CommitFlow AI: Set OpenRouter API Key"
+      },
+      {
+        "command": "commitflow-ai.clearApiKey",
+        "title": "CommitFlow AI: Clear OpenRouter API Key"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "commitflow-ai.sync",
+        "key": "ctrl+alt+s"
+      }
+    ],
+    "configuration": {
+      "title": "CommitFlow AI",
+      "properties": {
+        "commitflow-ai.model": {
+          "type": "string",
+          "default": "openai/gpt-4o",
+          "description": "OpenRouter model used to generate commit messages."
+        },
+        "commitflow-ai.maxFullDiffBytes": {
+          "type": "number",
+          "default": 40000,
+          "description": "Maximum staged diff size for sending the full diff to the AI."
+        },
+        "commitflow-ai.maxReducedDiffBytes": {
+          "type": "number",
+          "default": 150000,
+          "description": "Maximum staged diff size before switching to a structured summary."
+        },
+        "commitflow-ai.commitStyle": {
+          "type": "string",
+          "enum": [
+            "conventional",
+            "simple",
+            "descriptive"
+          ],
+          "default": "conventional",
+          "description": "Preferred commit message style."
+        },
+        "commitflow-ai.maxCommitLength": {
+          "type": "number",
+          "default": 72,
+          "description": "Maximum recommended commit message length."
+        },
+        "commitflow-ai.autoPush": {
+          "type": "boolean",
+          "default": true,
+          "description": "Push after committing."
+        },
+        "commitflow-ai.fallbackCommitMessage": {
+          "type": "string",
+          "default": "chore: update files",
+          "description": "Commit message used when AI generation fails (missing/invalid API key, network error, rate limit, etc). Leave empty to disable the fallback and show an error instead."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "vscode:prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vscode/test-electron": "^2.3.0",
+    "@vscode/vsce": "^2.24.0",
+    "typescript": "^5.3.0"
+  }
+}
