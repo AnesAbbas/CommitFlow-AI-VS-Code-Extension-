@@ -75,7 +75,7 @@ Ctrl + Alt + S
 | `commitflow-ai.bedrockModel` | `openai.gpt-oss-120b` | Bedrock model ID used to generate commit messages (used when `commitflow-ai.provider` is `bedrock`). |
 | `commitflow-ai.maxFullDiffBytes` | `40000` | Maximum staged diff size (bytes) sent as a full diff. |
 | `commitflow-ai.maxReducedDiffBytes` | `150000` | Maximum staged diff size (bytes) before switching to a structured summary. |
-| `commitflow-ai.commitStyle` | `conventional` | `conventional`, `simple`, or `descriptive`. |
+| `commitflow-ai.commitStyle` | `conventional` | `conventional` (`type: short description`, e.g. `feat: add dark mode toggle`), `simple` (plain-language summary, no type prefix, e.g. `add dark mode toggle`), or `descriptive` (longer explanatory summary with extra context). |
 | `commitflow-ai.maxCommitLength` | `72` | Maximum recommended commit message length. |
 | `commitflow-ai.autoPush` | `true` | Push automatically after committing. |
 | `commitflow-ai.fallbackCommitMessage` | `chore: update files` | Commit message used when AI generation fails. Set to an empty string to disable the fallback and surface the error instead. |

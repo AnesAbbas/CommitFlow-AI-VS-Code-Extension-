@@ -98,6 +98,11 @@
             "simple",
             "descriptive"
           ],
+          "enumDescriptions": [
+            "type: short description (e.g. \"feat: add dark mode toggle\"), using types like feat, fix, refactor, docs, test, chore, perf, style, build.",
+            "A short, plain-language summary of the change with no type prefix (e.g. \"add dark mode toggle\").",
+            "A longer, more explanatory summary that gives extra context about what changed and why, still within the max length."
+          ],
           "default": "conventional",
           "description": "Preferred commit message style."
         },
