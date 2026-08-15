@@ -52,14 +52,14 @@ or, in VS Code: Extensions view → `...` menu → **Install from VSIX...**.
 
 ## Publishing to the Marketplace
 
-1. Create a [publisher](https://marketplace.visualstudio.com/manage) and an
-   Azure DevOps Personal Access Token (Marketplace: Manage scope).
-2. Set the real `publisher` field in `commitflow-ai/package.json` (currently
-   `your-publisher-name`).
-3. Log in and publish:
+1. Create the [`TreehouseTechLabs`](https://marketplace.visualstudio.com/manage)
+   publisher (matching the `publisher` field already set in
+   `commitflow-ai/package.json`) and an Azure DevOps Personal Access Token
+   (Marketplace: Manage scope).
+2. Log in and publish:
 
    ```bash
-   npx @vscode/vsce login <publisher-name>
+   npx @vscode/vsce login TreehouseTechLabs
    npx @vscode/vsce publish
    ```
 
