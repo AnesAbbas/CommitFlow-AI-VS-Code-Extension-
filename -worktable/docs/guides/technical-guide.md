@@ -79,16 +79,28 @@ interpolation/injection surface and it works identically cross-platform.
 - Reads the API key from `context.secrets` (`commitflow-ai.openrouterApiKey`)
   — never from `settings.json` or the package.
 - POSTs to `https://openrouter.ai/api/v1/chat/completions` with the model
-  from `commitflow-ai.model`, `temperature: 0.2`, `max_tokens: 100`.
-- `cleanCommitMessage()` strips wrapping quotes/backticks, a leading
-  "commit message:" prefix, collapses newlines, and truncates to
+  from `commitflow-ai.model` (default `openrouter/free`), `temperature: 0.1`,
+  `max_tokens: 80`.
+- The response body is read as text first, then `JSON.parse`d, so a non-JSON
+  error body (HTML error page, empty body, etc.) surfaces as a clear "invalid
+  JSON" error instead of an opaque parse exception. An in-body
+  `{ error: { message } }` (some OpenRouter failures return `200`/`4xx` with
+  this shape) is also checked and thrown explicitly.
+- `message.content` is accepted as either a plain string or an array of
+  `{ type, text }` parts (some OpenRouter models/providers return content
+  blocks instead of a flat string) — both shapes are normalized before
+  cleanup.
+- `cleanCommitMessage()` strips Markdown code fences, wrapping quotes,
+  collapses the response down to its first non-empty line (in case the
+  model ignores the "one message" instruction), strips a leading
+  "commit message:"/"message:" prefix, and truncates to
   `commitflow-ai.maxCommitLength` on a word boundary.
 
 ## Settings (contributed in `package.json`)
 
 | Setting | Default | Purpose |
 | --- | --- | --- |
-| `commitflow-ai.model` | `openai/gpt-4o` | OpenRouter model id. |
+| `commitflow-ai.model` | `openrouter/free` | OpenRouter model id. |
 | `commitflow-ai.maxFullDiffBytes` | `40000` | Full-diff cutoff. |
 | `commitflow-ai.maxReducedDiffBytes` | `150000` | Reduced-diff cutoff. |
 | `commitflow-ai.commitStyle` | `conventional` | Passed into the AI prompt. |

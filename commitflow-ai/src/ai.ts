@@ -1,11 +1,23 @@
 import * as vscode from "vscode";
 
 interface OpenRouterResponse {
+    id?: string;
+    model?: string;
     choices?: Array<{
+        index?: number;
+        finish_reason?: string;
         message?: {
-            content?: string;
+            role?: string;
+            content?: string | Array<{
+                type?: string;
+                text?: string;
+            }>;
         };
     }>;
+    error?: {
+        message?: string;
+        code?: string | number;
+    };
 }
 
 export async function generateCommitMessage(
@@ -32,7 +44,7 @@ export async function generateCommitMessage(
     const model =
         config.get<string>(
             "model",
-            "openai/gpt-4o"
+            "openrouter/free"
         );
 
     const style =
@@ -51,22 +63,22 @@ export async function generateCommitMessage(
 Generate ONE Git commit message for the staged changes below.
 
 Rules:
-
-- Return ONLY the commit message.
-- Do not wrap it in quotes.
+- Return ONLY ONE commit message.
+- Do not provide alternatives.
+- Do not explain your answer.
 - Do not use Markdown.
+- Do not wrap the message in quotes.
 - Maximum ${maxLength} characters.
 - Describe the primary purpose of the change.
-- Do not merely list changed files.
 - Use imperative language.
 
 Commit style:
 ${style}
 
-If style is "conventional", use:
+If using conventional commits, use:
 type: short description
 
-Possible types:
+Allowed types:
 feat
 fix
 refactor
@@ -89,8 +101,10 @@ ${input}
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${apiKey}`,
-                "HTTP-Referer": "https://marketplace.visualstudio.com/",
-                "X-Title": "CommitFlow AI"
+                "HTTP-Referer":
+                    "https://marketplace.visualstudio.com/",
+                "X-Title":
+                    "CommitFlow AI"
             },
             body: JSON.stringify({
                 model,
@@ -100,30 +114,71 @@ ${input}
                         content: prompt
                     }
                 ],
-                temperature: 0.2,
-                max_tokens: 100
+                temperature: 0.1,
+                max_tokens: 80
             })
         }
     );
 
-    if (!response.ok) {
-        const errorText =
-            await response.text();
+    const rawText =
+        await response.text();
 
+    if (!response.ok) {
         throw new Error(
-            `OpenRouter request failed (${response.status}): ${errorText}`
+            `OpenRouter request failed (${response.status}): ${rawText}`
         );
     }
 
-    const data =
-        await response.json() as OpenRouterResponse;
+    let data: OpenRouterResponse;
 
-    const message =
-        data.choices?.[0]?.message?.content?.trim();
+    try {
+        data =
+            JSON.parse(rawText) as OpenRouterResponse;
+    } catch {
+        throw new Error(
+            `OpenRouter returned invalid JSON: ${rawText.substring(0, 1000)}`
+        );
+    }
+
+    if (data.error) {
+        throw new Error(
+            `OpenRouter error: ${
+                data.error.message ?? "Unknown error"
+            }`
+        );
+    }
+
+    const choice =
+        data.choices?.[0];
+
+    if (!choice) {
+        throw new Error(
+            `OpenRouter returned no choices. Response: ${rawText.substring(0, 1000)}`
+        );
+    }
+
+    let message = "";
+
+    const content =
+        choice.message?.content;
+
+    if (typeof content === "string") {
+
+        message = content;
+
+    } else if (Array.isArray(content)) {
+
+        message = content
+            .map(part => part.text ?? "")
+            .join("");
+    }
+
+    message = message.trim();
 
     if (!message) {
         throw new Error(
-            "OpenRouter returned an empty commit message."
+            `OpenRouter returned an empty commit message. ` +
+            `Model: ${data.model ?? "unknown"}`
         );
     }
 
@@ -138,17 +193,42 @@ function cleanCommitMessage(
     maxLength: number
 ): string {
 
-    let result =
-        message
-            .replace(/^["'`]+/, "")
-            .replace(/["'`]+$/, "")
-            .replace(/^commit message:\s*/i, "")
-            .replace(/\r?\n/g, " ")
-            .trim();
+    let result = message.trim();
+
+    // Remove Markdown code fences.
+    result = result
+        .replace(/^```[a-zA-Z]*\s*/, "")
+        .replace(/\s*```$/, "")
+        .trim();
+
+    // Remove leading/trailing quotes.
+    result = result
+        .replace(/^["']+/, "")
+        .replace(/["']+$/, "")
+        .trim();
+
+    // If the model ignored the "one message" instruction
+    // and returned multiple lines, use the first meaningful line.
+    const lines =
+        result
+            .split(/\r?\n/)
+            .map(line => line.trim())
+            .filter(Boolean);
+
+    if (lines.length > 0) {
+        result = lines[0];
+    }
+
+    // Remove common prefixes.
+    result = result
+        .replace(/^commit message:\s*/i, "")
+        .replace(/^message:\s*/i, "")
+        .trim();
 
     if (result.length > maxLength) {
         result =
-            result.substring(0, maxLength)
+            result
+                .substring(0, maxLength)
                 .replace(/\s+\S*$/, "")
                 .trim();
     }
