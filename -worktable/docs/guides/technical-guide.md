@@ -131,12 +131,12 @@ name differ per provider:
 | `commitflow-ai.openrouterModel` | `~anthropic/claude-sonnet-latest` | OpenRouter model id (provider `openrouter`). Renamed from `commitflow-ai.model`; see `migrateModelSetting()` below. |
 | `commitflow-ai.bedrockRegion` | `us-east-1` | AWS region for the Bedrock runtime endpoint (provider `bedrock`). |
 | `commitflow-ai.bedrockModel` | `openai.gpt-oss-120b` | Bedrock model id (provider `bedrock`). |
-| `commitflow-ai.maxFullDiffBytes` | `40000` | Full-diff cutoff. |
-| `commitflow-ai.maxReducedDiffBytes` | `150000` | Reduced-diff cutoff. |
 | `commitflow-ai.commitStyle` | `conventional` | Passed into the AI prompt. `conventional` (`type: short description`, e.g. `feat`/`fix`/`refactor`/etc.), `simple` (plain-language summary, no type prefix), or `descriptive` (longer explanatory summary). Each option's `enumDescriptions` entry in `package.json` is shown in the VS Code Settings UI. |
 | `commitflow-ai.maxCommitLength` | `72` | Enforced client-side after generation. |
-| `commitflow-ai.autoPush` | `true` | Gate on the push step. |
 | `commitflow-ai.fallbackCommitMessage` | `chore: update files` | Used when AI generation fails; empty disables fallback. |
+| `commitflow-ai.autoPush` | `true` | Gate on the push step. |
+| `commitflow-ai.maxFullDiffBytes` | `40000` | Full-diff cutoff. |
+| `commitflow-ai.maxReducedDiffBytes` | `150000` | Reduced-diff cutoff. |
 
 ## Commands
 

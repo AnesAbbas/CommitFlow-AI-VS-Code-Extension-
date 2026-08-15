@@ -81,16 +81,6 @@
           "default": "openai.gpt-oss-120b",
           "description": "Bedrock model ID used to generate commit messages (used when commitflow-ai.provider is \"bedrock\")."
         },
-        "commitflow-ai.maxFullDiffBytes": {
-          "type": "number",
-          "default": 40000,
-          "description": "Maximum staged diff size for sending the full diff to the AI."
-        },
-        "commitflow-ai.maxReducedDiffBytes": {
-          "type": "number",
-          "default": 150000,
-          "description": "Maximum staged diff size before switching to a structured summary."
-        },
         "commitflow-ai.commitStyle": {
           "type": "string",
           "enum": [
@@ -111,15 +101,25 @@
           "default": 72,
           "description": "Maximum recommended commit message length."
         },
+        "commitflow-ai.fallbackCommitMessage": {
+          "type": "string",
+          "default": "chore: update files",
+          "description": "Commit message used when AI generation fails (missing/invalid API key, network error, rate limit, etc). Leave empty to disable the fallback and show an error instead."
+        },
         "commitflow-ai.autoPush": {
           "type": "boolean",
           "default": true,
           "description": "Push after committing."
         },
-        "commitflow-ai.fallbackCommitMessage": {
-          "type": "string",
-          "default": "chore: update files",
-          "description": "Commit message used when AI generation fails (missing/invalid API key, network error, rate limit, etc). Leave empty to disable the fallback and show an error instead."
+        "commitflow-ai.maxFullDiffBytes": {
+          "type": "number",
+          "default": 40000,
+          "description": "Maximum staged diff size for sending the full diff to the AI."
+        },
+        "commitflow-ai.maxReducedDiffBytes": {
+          "type": "number",
+          "default": 150000,
+          "description": "Maximum staged diff size before switching to a structured summary."
         }
       }
     }
