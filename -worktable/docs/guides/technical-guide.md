@@ -8,6 +8,8 @@ commit → push workflow behind a single command/keybinding
 commit message from the staged diff.
 
 Source lives in [`commitflow-ai/`](../../../commitflow-ai) at the repo root.
+For build/run/package/publish steps, see
+[`setup-and-deployment.md`](setup-and-deployment.md).
 
 ```text
 commitflow-ai/
