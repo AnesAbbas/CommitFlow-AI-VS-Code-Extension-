@@ -93,10 +93,10 @@ name differ per provider:
   - `openrouter` → `https://openrouter.ai/api/v1/chat/completions`, with
     `HTTP-Referer`/`X-Title` headers set, model from
     `commitflow-ai.openrouterModel` (default `~anthropic/claude-sonnet-latest`).
-  - `bedrock` → `https://bedrock-runtime.<commitflow-ai.bedrockRegion>.amazonaws.com/v1/chat/completions`
+  - `bedrock` → `https://bedrock-mantle.<commitflow-ai.bedrockRegion>.api.aws/v1/chat/completions`
     (region default `us-east-1`), model from `commitflow-ai.bedrockModel`
-    (default `us.anthropic.claude-sonnet-4-6`). The Bedrock API key is sent
-    as a bearer token, matching AWS's documented Bedrock API key usage.
+    (default `openai.gpt-oss-120b`). The Bedrock API key is sent as a
+    bearer token, matching AWS's documented Bedrock API key usage.
 - Both requests use `temperature: 0.1`, `max_tokens: 200`.
 - The response body is read as text first, then `JSON.parse`d, so a non-JSON
   error body (HTML error page, empty body, etc.) surfaces as a clear "invalid
@@ -122,7 +122,7 @@ name differ per provider:
 | `commitflow-ai.provider` | `openrouter` | `openrouter` or `bedrock`. |
 | `commitflow-ai.openrouterModel` | `~anthropic/claude-sonnet-latest` | OpenRouter model id (provider `openrouter`). Renamed from `commitflow-ai.model`; see `migrateModelSetting()` below. |
 | `commitflow-ai.bedrockRegion` | `us-east-1` | AWS region for the Bedrock runtime endpoint (provider `bedrock`). |
-| `commitflow-ai.bedrockModel` | `us.anthropic.claude-sonnet-4-6` | Bedrock model id (provider `bedrock`). |
+| `commitflow-ai.bedrockModel` | `openai.gpt-oss-120b` | Bedrock model id (provider `bedrock`). |
 | `commitflow-ai.maxFullDiffBytes` | `40000` | Full-diff cutoff. |
 | `commitflow-ai.maxReducedDiffBytes` | `150000` | Reduced-diff cutoff. |
 | `commitflow-ai.commitStyle` | `conventional` | Passed into the AI prompt. |

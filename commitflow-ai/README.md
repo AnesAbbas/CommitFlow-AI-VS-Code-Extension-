@@ -69,7 +69,7 @@ Ctrl + Alt + S
 | `commitflow-ai.provider` | `openrouter` | AI provider used to generate commit messages: `openrouter` or `bedrock`. |
 | `commitflow-ai.openrouterModel` | `~anthropic/claude-sonnet-latest` | OpenRouter model used to generate commit messages (used when `commitflow-ai.provider` is `openrouter`). |
 | `commitflow-ai.bedrockRegion` | `us-east-1` | AWS region of the Bedrock runtime endpoint (used when `commitflow-ai.provider` is `bedrock`). |
-| `commitflow-ai.bedrockModel` | `us.anthropic.claude-sonnet-4-6` | Bedrock model ID used to generate commit messages (used when `commitflow-ai.provider` is `bedrock`). |
+| `commitflow-ai.bedrockModel` | `openai.gpt-oss-120b` | Bedrock model ID used to generate commit messages (used when `commitflow-ai.provider` is `bedrock`). |
 | `commitflow-ai.maxFullDiffBytes` | `40000` | Maximum staged diff size (bytes) sent as a full diff. |
 | `commitflow-ai.maxReducedDiffBytes` | `150000` | Maximum staged diff size (bytes) before switching to a structured summary. |
 | `commitflow-ai.commitStyle` | `conventional` | `conventional`, `simple`, or `descriptive`. |
@@ -102,12 +102,12 @@ Ctrl + Alt + S
 
 Set `commitflow-ai.provider` to `bedrock` to generate commit messages via
 Amazon Bedrock's OpenAI-compatible Chat Completions endpoint
-(`https://bedrock-runtime.<region>.amazonaws.com/v1/chat/completions`)
+(`https://bedrock-mantle.<region>.api.aws/v1/chat/completions`)
 instead of OpenRouter. Configure:
 
 - `commitflow-ai.bedrockRegion` — the AWS region (default `us-east-1`).
 - `commitflow-ai.bedrockModel` — the Bedrock model ID (default
-  `us.anthropic.claude-sonnet-4-6`).
+  `openai.gpt-oss-120b`).
 - Run `CommitFlow AI: Set API Key (for Active Provider)` while
   `commitflow-ai.provider` is `bedrock` to store your Bedrock API key. It's
   stored separately from your OpenRouter key, so switching

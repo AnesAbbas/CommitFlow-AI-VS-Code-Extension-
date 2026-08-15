@@ -74,11 +74,11 @@
         "commitflow-ai.bedrockRegion": {
           "type": "string",
           "default": "us-east-1",
-          "description": "AWS region of the Bedrock runtime endpoint (used when commitflow-ai.provider is \"bedrock\")."
+          "description": "AWS region of the Bedrock Mantle (OpenAI-compatible) endpoint (used when commitflow-ai.provider is \"bedrock\")."
         },
         "commitflow-ai.bedrockModel": {
           "type": "string",
-          "default": "us.anthropic.claude-sonnet-4-6",
+          "default": "openai.gpt-oss-120b",
           "description": "Bedrock model ID used to generate commit messages (used when commitflow-ai.provider is \"bedrock\")."
         },
         "commitflow-ai.maxFullDiffBytes": {

@@ -82,7 +82,7 @@ export async function generateCommitMessage(
         provider === "bedrock"
             ? config.get<string>(
                 "bedrockModel",
-                "us.anthropic.claude-sonnet-4-6"
+                "openai.gpt-oss-120b"
             )
             : config.get<string>(
                 "openrouterModel",
@@ -138,15 +138,15 @@ ${input}
 
     /*
      * OpenRouter and Amazon Bedrock's Chat Completions endpoint
-     * (https://bedrock-runtime.<region>.amazonaws.com/v1/chat/completions)
+     * (https://bedrock-mantle.<region>.api.aws/v1/chat/completions)
      * both speak the same OpenAI-compatible request/response shape, so a
      * single request builder and response parser cover both providers.
      */
     const endpoint =
         provider === "bedrock"
-            ? `https://bedrock-runtime.${
+            ? `https://bedrock-mantle.${
                 config.get<string>("bedrockRegion", "us-east-1")
-            }.amazonaws.com/v1/chat/completions`
+            }.api.aws/v1/chat/completions`
             : "https://openrouter.ai/api/v1/chat/completions";
 
     const headers: Record<string, string> = {
