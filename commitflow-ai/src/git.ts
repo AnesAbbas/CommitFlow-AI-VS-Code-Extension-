@@ -68,8 +68,13 @@ export async function commit(
     cwd: string,
     message: string
 ): Promise<void> {
+    // execFile rejects args containing null bytes; some models
+    // occasionally emit stray control characters in their output.
+    const sanitized =
+        message.replace(/\x00/g, "").trim();
+
     await git(
-        ["commit", "-m", message],
+        ["commit", "-m", sanitized],
         cwd
     );
 }

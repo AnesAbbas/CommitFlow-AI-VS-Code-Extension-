@@ -9,6 +9,10 @@
   now retries with `git push --set-upstream origin <branch>` instead of
   throwing "no upstream branch" (previously surfaced as an error toast
   that looked like nothing happened after the commit).
+- Fixed `commit()` throwing `ERR_INVALID_ARG_VALUE` ("must be a string
+  without null bytes") when the AI response contained a stray `\x00`
+  control character — the commit message is now sanitized before being
+  passed to `git commit -m`.
 
 ## 0.0.1
 
