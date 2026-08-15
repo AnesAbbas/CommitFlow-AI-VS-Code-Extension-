@@ -53,7 +53,7 @@
       "properties": {
         "commitflow-ai.model": {
           "type": "string",
-          "default": "openai/gpt-4o",
+          "default": "openrouter/free",
           "description": "OpenRouter model used to generate commit messages."
         },
         "commitflow-ai.maxFullDiffBytes": {
