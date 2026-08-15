@@ -44,7 +44,10 @@ commitflow-ai/
 6. The generated commit message is shown as a non-blocking info
    notification (no confirmation prompt — the sync proceeds automatically).
 7. `commit(cwd, message)`, then `push(cwd)` if `commitflow-ai.autoPush` is
-   `true` (default).
+   `true` (default). `push(cwd)` runs plain `git push`; if that fails
+   because the current branch has no upstream yet, it retries with
+   `git push --set-upstream origin <branch>` instead of surfacing an
+   error for what is really a first-push-on-a-new-branch situation.
 
 ## Fallback commit message
 

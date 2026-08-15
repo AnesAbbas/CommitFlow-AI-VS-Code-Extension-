@@ -1,0 +1,12 @@
+- [ ] add proper descriptions to comment styles so the user can understand the deifference between them in configuration page
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 

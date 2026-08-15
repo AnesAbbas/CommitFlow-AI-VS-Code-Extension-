@@ -5,6 +5,10 @@
 - Removed the commit/push confirmation dialog — `Ctrl+Alt+S` now commits
   (and pushes, per `commitflow-ai.autoPush`) automatically, showing the
   generated commit message as a notification instead of blocking on it.
+- Fixed auto-push silently failing on a branch with no upstream: `push()`
+  now retries with `git push --set-upstream origin <branch>` instead of
+  throwing "no upstream branch" (previously surfaced as an error toast
+  that looked like nothing happened after the commit).
 
 ## 0.0.1
 

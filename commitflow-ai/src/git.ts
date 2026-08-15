@@ -75,5 +75,27 @@ export async function commit(
 }
 
 export async function push(cwd: string): Promise<void> {
-    await git(["push"], cwd);
+    try {
+        await git(["push"], cwd);
+    } catch (error) {
+        const message =
+            error instanceof Error
+                ? error.message
+                : String(error);
+
+        if (!/no upstream branch/i.test(message)) {
+            throw error;
+        }
+
+        const branch =
+            await git(
+                ["rev-parse", "--abbrev-ref", "HEAD"],
+                cwd
+            );
+
+        await git(
+            ["push", "--set-upstream", "origin", branch],
+            cwd
+        );
+    }
 }
