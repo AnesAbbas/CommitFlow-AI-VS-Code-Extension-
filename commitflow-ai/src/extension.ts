@@ -13,7 +13,10 @@ import {
 } from "./git";
 
 import {
-    generateCommitMessage
+    generateCommitMessage,
+    getProvider,
+    getProviderLabel,
+    getApiKeySecretName
 } from "./ai";
 
 import { CommitResult } from "./types";
@@ -21,6 +24,8 @@ import { CommitResult } from "./types";
 export function activate(
     context: vscode.ExtensionContext
 ) {
+
+    migrateModelSetting();
 
     const syncCommand =
         vscode.commands.registerCommand(
@@ -370,18 +375,89 @@ Do not assume details that are not present.
 `;
 }
 
+/**
+ * `commitflow-ai.model` was renamed to `commitflow-ai.openrouterModel` to
+ * match `commitflow-ai.bedrockModel`. Copy any value a user already has
+ * under the old key over to the new key (per scope), then clear the old
+ * key so it stops shadowing the new one.
+ */
+async function migrateModelSetting() {
+
+    const config =
+        vscode.workspace.getConfiguration(
+            "commitflow-ai"
+        );
+
+    const oldSetting =
+        config.inspect<string>("model");
+
+    const newSetting =
+        config.inspect<string>("openrouterModel");
+
+    const scopes: Array<{
+        oldValue: string | undefined;
+        newValue: string | undefined;
+        target: vscode.ConfigurationTarget;
+    }> = [
+        {
+            oldValue: oldSetting?.globalValue,
+            newValue: newSetting?.globalValue,
+            target: vscode.ConfigurationTarget.Global
+        },
+        {
+            oldValue: oldSetting?.workspaceValue,
+            newValue: newSetting?.workspaceValue,
+            target: vscode.ConfigurationTarget.Workspace
+        }
+    ];
+
+    for (const scope of scopes) {
+
+        if (scope.oldValue === undefined) {
+            continue;
+        }
+
+        if (scope.newValue === undefined) {
+            await config.update(
+                "openrouterModel",
+                scope.oldValue,
+                scope.target
+            );
+        }
+
+        await config.update(
+            "model",
+            undefined,
+            scope.target
+        );
+    }
+}
+
 async function setApiKey(
     context: vscode.ExtensionContext
 ) {
 
+    const config =
+        vscode.workspace.getConfiguration(
+            "commitflow-ai"
+        );
+
+    const provider =
+        getProvider(config);
+
+    const providerLabel =
+        getProviderLabel(provider);
+
     const key =
         await vscode.window.showInputBox({
             prompt:
-                "Enter your OpenRouter API key",
+                `Enter your ${providerLabel} API key`,
             password: true,
             ignoreFocusOut: true,
             placeHolder:
-                "sk-or-v1-..."
+                provider === "bedrock"
+                    ? "ABSK..."
+                    : "sk-or-v1-..."
         });
 
     if (!key) {
@@ -389,12 +465,12 @@ async function setApiKey(
     }
 
     await context.secrets.store(
-        "commitflow-ai.openrouterApiKey",
+        getApiKeySecretName(provider),
         key.trim()
     );
 
     vscode.window.showInformationMessage(
-        "CommitFlow AI: OpenRouter API key saved securely."
+        `CommitFlow AI: ${providerLabel} API key saved securely.`
     );
 }
 
@@ -402,12 +478,23 @@ async function clearApiKey(
     context: vscode.ExtensionContext
 ) {
 
+    const config =
+        vscode.workspace.getConfiguration(
+            "commitflow-ai"
+        );
+
+    const provider =
+        getProvider(config);
+
+    const providerLabel =
+        getProviderLabel(provider);
+
     await context.secrets.delete(
-        "commitflow-ai.openrouterApiKey"
+        getApiKeySecretName(provider)
     );
 
     vscode.window.showInformationMessage(
-        "CommitFlow AI: OpenRouter API key removed."
+        `CommitFlow AI: ${providerLabel} API key removed.`
     );
 }
 

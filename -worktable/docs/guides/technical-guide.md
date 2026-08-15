@@ -4,8 +4,9 @@
 
 CommitFlow AI is a VS Code extension that automates the pull → stage →
 commit → push workflow behind a single command/keybinding
-(`commitflow-ai.sync`, `Ctrl+Alt+S`), using OpenRouter to generate the
-commit message from the staged diff.
+(`commitflow-ai.sync`, `Ctrl+Alt+S`), using OpenRouter or Amazon Bedrock
+(user-selectable via `commitflow-ai.provider`) to generate the commit
+message from the staged diff.
 
 Source lives in [`commitflow-ai/`](../../../commitflow-ai) at the repo root.
 For build/run/package/publish steps, see
@@ -19,7 +20,7 @@ commitflow-ai/
 ├── src/
 │   ├── extension.ts      # command registration, sync workflow, fallback logic
 │   ├── git.ts             # git operations (execFile wrapper, no shell)
-│   ├── ai.ts               # OpenRouter request + response cleanup
+│   ├── ai.ts               # OpenRouter/Bedrock request + response cleanup
 │   └── types.ts            # shared interfaces
 ├── package.json            # manifest: commands, keybindings, settings
 ├── tsconfig.json
@@ -62,9 +63,9 @@ commitflow-ai/
     surfaced via the top-level error handler in `runSync`, aborting the
     sync (previous behavior).
 
-This means an OpenRouter API key is **optional** for `commitflow-ai.sync`
-to run at all — without one, every sync uses the fallback message unless
-the user clears `commitflow-ai.fallbackCommitMessage`.
+This means an API key (for whichever provider is selected) is **optional**
+for `commitflow-ai.sync` to run at all — without one, every sync uses the
+fallback message unless the user clears `commitflow-ai.fallbackCommitMessage`.
 
 ## Git access (`src/git.ts`)
 
@@ -74,33 +75,54 @@ interpolation/injection surface and it works identically cross-platform.
 `hasStagedChanges` relies on `git diff --cached --quiet`'s exit code
 (non-zero ⇒ there are staged changes) rather than parsing output.
 
-## OpenRouter integration (`src/ai.ts`)
+## AI provider integration (`src/ai.ts`)
 
-- Reads the API key from `context.secrets` (`commitflow-ai.openrouterApiKey`)
-  — never from `settings.json` or the package.
-- POSTs to `https://openrouter.ai/api/v1/chat/completions` with the model
-  from `commitflow-ai.model` (default `~anthropic/claude-sonnet-latest`),
-  `temperature: 0.1`, `max_tokens: 200`.
+CommitFlow AI supports two providers, chosen via `commitflow-ai.provider`
+(`openrouter` default, or `bedrock`). Both OpenRouter and Amazon Bedrock's
+Chat Completions endpoint speak the same OpenAI-compatible request/response
+shape, so `generateCommitMessage()` uses one shared request builder and
+response parser — only the endpoint URL, model, headers, and API key secret
+name differ per provider:
+
+- `getProvider(config)` reads `commitflow-ai.provider`.
+- `getApiKeySecretName(provider)` maps to a provider-scoped secret key:
+  `commitflow-ai.openrouterApiKey` or `commitflow-ai.bedrockApiKey` — never
+  read from `settings.json` or the package. Keeping them separate means
+  switching providers doesn't clobber the other provider's stored key.
+- Endpoint:
+  - `openrouter` → `https://openrouter.ai/api/v1/chat/completions`, with
+    `HTTP-Referer`/`X-Title` headers set, model from
+    `commitflow-ai.openrouterModel` (default `~anthropic/claude-sonnet-latest`).
+  - `bedrock` → `https://bedrock-runtime.<commitflow-ai.bedrockRegion>.amazonaws.com/v1/chat/completions`
+    (region default `us-east-1`), model from `commitflow-ai.bedrockModel`
+    (default `us.anthropic.claude-sonnet-4-6`). The Bedrock API key is sent
+    as a bearer token, matching AWS's documented Bedrock API key usage.
+- Both requests use `temperature: 0.1`, `max_tokens: 200`.
 - The response body is read as text first, then `JSON.parse`d, so a non-JSON
   error body (HTML error page, empty body, etc.) surfaces as a clear "invalid
   JSON" error instead of an opaque parse exception. An in-body
   `{ error: { message } }` (some OpenRouter failures return `200`/`4xx` with
   this shape) is also checked and thrown explicitly.
 - `message.content` is accepted as either a plain string or an array of
-  `{ type, text }` parts (some OpenRouter models/providers return content
-  blocks instead of a flat string) — both shapes are normalized before
-  cleanup.
+  `{ type, text }` parts (some models/providers return content blocks
+  instead of a flat string) — both shapes are normalized before cleanup.
 - `cleanCommitMessage()` strips Markdown code fences, wrapping quotes,
   collapses the response down to its first non-empty line (in case the
   model ignores the "one message" instruction), strips a leading
   "commit message:"/"message:" prefix, and truncates to
   `commitflow-ai.maxCommitLength` on a word boundary.
+- All error messages are prefixed with the provider's display name
+  (`getProviderLabel()`: "OpenRouter" or "Amazon Bedrock") so failures are
+  attributable to the active provider.
 
 ## Settings (contributed in `package.json`)
 
 | Setting | Default | Purpose |
 | --- | --- | --- |
-| `commitflow-ai.model` | `~anthropic/claude-sonnet-latest` | OpenRouter model id. |
+| `commitflow-ai.provider` | `openrouter` | `openrouter` or `bedrock`. |
+| `commitflow-ai.openrouterModel` | `~anthropic/claude-sonnet-latest` | OpenRouter model id (provider `openrouter`). Renamed from `commitflow-ai.model`; see `migrateModelSetting()` below. |
+| `commitflow-ai.bedrockRegion` | `us-east-1` | AWS region for the Bedrock runtime endpoint (provider `bedrock`). |
+| `commitflow-ai.bedrockModel` | `us.anthropic.claude-sonnet-4-6` | Bedrock model id (provider `bedrock`). |
 | `commitflow-ai.maxFullDiffBytes` | `40000` | Full-diff cutoff. |
 | `commitflow-ai.maxReducedDiffBytes` | `150000` | Reduced-diff cutoff. |
 | `commitflow-ai.commitStyle` | `conventional` | Passed into the AI prompt. |
@@ -111,9 +133,25 @@ interpolation/injection surface and it works identically cross-platform.
 ## Commands
 
 - `commitflow-ai.sync` — the full workflow above (`Ctrl+Alt+S`).
-- `commitflow-ai.setApiKey` — `showInputBox({ password: true })` →
-  `context.secrets.store`.
-- `commitflow-ai.clearApiKey` — `context.secrets.delete`.
+- `commitflow-ai.setApiKey` (palette title: "CommitFlow AI: Set API Key (for
+  Active Provider)") — `showInputBox({ password: true })` →
+  `context.secrets.store`, keyed to the currently configured provider
+  (`getApiKeySecretName`). The input box prompt names the provider
+  explicitly (e.g. "Enter your Amazon Bedrock API key") since the palette
+  title itself can't reflect the live setting value.
+- `commitflow-ai.clearApiKey` (palette title: "CommitFlow AI: Clear API Key
+  (for Active Provider)") — `context.secrets.delete` for the currently
+  configured provider's key.
+
+## Settings migration (`migrateModelSetting()` in `src/extension.ts`)
+
+`commitflow-ai.model` was renamed to `commitflow-ai.openrouterModel` for
+symmetry with `commitflow-ai.bedrockModel`. On `activate()`,
+`migrateModelSetting()` inspects the old `model` key at Global and
+Workspace scope; for each scope with an old value it copies it to
+`openrouterModel` (only if `openrouterModel` isn't already set at that
+scope) and clears the old key. This runs once per activation and is
+effectively a no-op after the first run for a given scope.
 
 ## Build / run / package
 

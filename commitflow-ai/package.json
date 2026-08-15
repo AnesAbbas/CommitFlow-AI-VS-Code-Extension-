@@ -1,7 +1,7 @@
 {
   "name": "commitflow-ai",
   "displayName": "CommitFlow AI",
-  "description": "AI-powered Git sync with smart commit messages using OpenRouter",
+  "description": "AI-powered Git sync with smart commit messages using OpenRouter or Amazon Bedrock",
   "version": "0.0.1",
   "publisher": "your-publisher-name",
   "license": "MIT",
@@ -19,6 +19,8 @@
     "commit message",
     "ai",
     "openrouter",
+    "bedrock",
+    "aws",
     "git sync",
     "automation",
     "productivity"
@@ -35,11 +37,11 @@
       },
       {
         "command": "commitflow-ai.setApiKey",
-        "title": "CommitFlow AI: Set OpenRouter API Key"
+        "title": "CommitFlow AI: Set API Key (for Active Provider)"
       },
       {
         "command": "commitflow-ai.clearApiKey",
-        "title": "CommitFlow AI: Clear OpenRouter API Key"
+        "title": "CommitFlow AI: Clear API Key (for Active Provider)"
       }
     ],
     "keybindings": [
@@ -51,10 +53,33 @@
     "configuration": {
       "title": "CommitFlow AI",
       "properties": {
-        "commitflow-ai.model": {
+        "commitflow-ai.provider": {
+          "type": "string",
+          "enum": [
+            "openrouter",
+            "bedrock"
+          ],
+          "enumDescriptions": [
+            "Use OpenRouter to generate commit messages.",
+            "Use Amazon Bedrock's OpenAI-compatible Chat Completions endpoint."
+          ],
+          "default": "openrouter",
+          "description": "AI provider used to generate commit messages."
+        },
+        "commitflow-ai.openrouterModel": {
           "type": "string",
           "default": "~anthropic/claude-sonnet-latest",
-          "description": "OpenRouter model used to generate commit messages."
+          "description": "OpenRouter model used to generate commit messages (used when commitflow-ai.provider is \"openrouter\")."
+        },
+        "commitflow-ai.bedrockRegion": {
+          "type": "string",
+          "default": "us-east-1",
+          "description": "AWS region of the Bedrock runtime endpoint (used when commitflow-ai.provider is \"bedrock\")."
+        },
+        "commitflow-ai.bedrockModel": {
+          "type": "string",
+          "default": "us.anthropic.claude-sonnet-4-6",
+          "description": "Bedrock model ID used to generate commit messages (used when commitflow-ai.provider is \"bedrock\")."
         },
         "commitflow-ai.maxFullDiffBytes": {
           "type": "number",

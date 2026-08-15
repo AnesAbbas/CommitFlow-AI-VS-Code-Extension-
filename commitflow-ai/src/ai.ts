@@ -1,6 +1,8 @@
 import * as vscode from "vscode";
 
-interface OpenRouterResponse {
+export type AiProvider = "openrouter" | "bedrock";
+
+interface ChatCompletionResponse {
     id?: string;
     model?: string;
     choices?: Array<{
@@ -20,32 +22,72 @@ interface OpenRouterResponse {
     };
 }
 
+export function getProvider(
+    config: vscode.WorkspaceConfiguration
+): AiProvider {
+    return config.get<AiProvider>(
+        "provider",
+        "openrouter"
+    );
+}
+
+export function getProviderLabel(
+    provider: AiProvider
+): string {
+    return provider === "bedrock"
+        ? "Amazon Bedrock"
+        : "OpenRouter";
+}
+
+/**
+ * Each provider's API key is stored under its own secret so switching
+ * providers doesn't clobber the other provider's stored key.
+ */
+export function getApiKeySecretName(
+    provider: AiProvider
+): string {
+    return provider === "bedrock"
+        ? "commitflow-ai.bedrockApiKey"
+        : "commitflow-ai.openrouterApiKey";
+}
+
 export async function generateCommitMessage(
     context: vscode.ExtensionContext,
     input: string
 ): Promise<string> {
-
-    const apiKey =
-        await context.secrets.get(
-            "commitflow-ai.openrouterApiKey"
-        );
-
-    if (!apiKey) {
-        throw new Error(
-            "OpenRouter API key has not been configured."
-        );
-    }
 
     const config =
         vscode.workspace.getConfiguration(
             "commitflow-ai"
         );
 
-    const model =
-        config.get<string>(
-            "model",
-            "~anthropic/claude-sonnet-latest"
+    const provider =
+        getProvider(config);
+
+    const providerLabel =
+        getProviderLabel(provider);
+
+    const apiKey =
+        await context.secrets.get(
+            getApiKeySecretName(provider)
         );
+
+    if (!apiKey) {
+        throw new Error(
+            `${providerLabel} API key has not been configured.`
+        );
+    }
+
+    const model =
+        provider === "bedrock"
+            ? config.get<string>(
+                "bedrockModel",
+                "us.anthropic.claude-sonnet-4-6"
+            )
+            : config.get<string>(
+                "openrouterModel",
+                "~anthropic/claude-sonnet-latest"
+            );
 
     const style =
         config.get<string>(
@@ -94,18 +136,36 @@ Changes:
 ${input}
 `;
 
+    /*
+     * OpenRouter and Amazon Bedrock's Chat Completions endpoint
+     * (https://bedrock-runtime.<region>.amazonaws.com/v1/chat/completions)
+     * both speak the same OpenAI-compatible request/response shape, so a
+     * single request builder and response parser cover both providers.
+     */
+    const endpoint =
+        provider === "bedrock"
+            ? `https://bedrock-runtime.${
+                config.get<string>("bedrockRegion", "us-east-1")
+            }.amazonaws.com/v1/chat/completions`
+            : "https://openrouter.ai/api/v1/chat/completions";
+
+    const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+    };
+
+    if (provider === "openrouter") {
+        headers["HTTP-Referer"] =
+            "https://marketplace.visualstudio.com/";
+        headers["X-Title"] =
+            "CommitFlow AI";
+    }
+
     const response = await fetch(
-        "https://openrouter.ai/api/v1/chat/completions",
+        endpoint,
         {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${apiKey}`,
-                "HTTP-Referer":
-                    "https://marketplace.visualstudio.com/",
-                "X-Title":
-                    "CommitFlow AI"
-            },
+            headers,
             body: JSON.stringify({
                 model,
                 messages: [
@@ -125,24 +185,24 @@ ${input}
 
     if (!response.ok) {
         throw new Error(
-            `OpenRouter request failed (${response.status}): ${rawText}`
+            `${providerLabel} request failed (${response.status}): ${rawText}`
         );
     }
 
-    let data: OpenRouterResponse;
+    let data: ChatCompletionResponse;
 
     try {
         data =
-            JSON.parse(rawText) as OpenRouterResponse;
+            JSON.parse(rawText) as ChatCompletionResponse;
     } catch {
         throw new Error(
-            `OpenRouter returned invalid JSON: ${rawText.substring(0, 1000)}`
+            `${providerLabel} returned invalid JSON: ${rawText.substring(0, 1000)}`
         );
     }
 
     if (data.error) {
         throw new Error(
-            `OpenRouter error: ${
+            `${providerLabel} error: ${
                 data.error.message ?? "Unknown error"
             }`
         );
@@ -153,7 +213,7 @@ ${input}
 
     if (!choice) {
         throw new Error(
-            `OpenRouter returned no choices. Response: ${rawText.substring(0, 1000)}`
+            `${providerLabel} returned no choices. Response: ${rawText.substring(0, 1000)}`
         );
     }
 
@@ -177,7 +237,7 @@ ${input}
 
     if (!message) {
         throw new Error(
-            `OpenRouter returned an empty commit message. ` +
+            `${providerLabel} returned an empty commit message. ` +
             `Model: ${data.model ?? "unknown"}`
         );
     }
