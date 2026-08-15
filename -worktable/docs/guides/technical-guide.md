@@ -125,6 +125,10 @@ name differ per provider:
 
 ## Settings (contributed in `package.json`)
 
+VS Code's Settings UI sorts properties alphabetically by ID unless each one
+declares an explicit numeric `order`; the table below lists settings in that
+`order` (1-10), which is also their declaration order in `package.json`.
+
 | Setting | Default | Purpose |
 | --- | --- | --- |
 | `commitflow-ai.provider` | `openrouter` | `openrouter` or `bedrock`. |
