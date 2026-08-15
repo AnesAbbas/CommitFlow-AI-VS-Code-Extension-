@@ -2,7 +2,7 @@
   "name": "commitflow-ai",
   "displayName": "CommitFlow AI",
   "description": "One keyboard shortcut to pull, stage, commit with an AI-generated message, and push your Git changes automatically.",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "icon": "icon.png",
   "publisher": "TreehouseTechLabs",
   "license": "MIT",
