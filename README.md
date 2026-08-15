@@ -10,6 +10,7 @@ staged changes → generate a commit message via OpenRouter or Amazon Bedrock
 - **Technical guide:** [`-worktable/docs/guides/technical-guide.md`](-worktable/docs/guides/technical-guide.md)
 - **Setup & deployment:** [`-worktable/docs/guides/setup-and-deployment.md`](-worktable/docs/guides/setup-and-deployment.md)
 - **Original design plan:** [`-worktable/docs/plan.md`](-worktable/docs/plan.md)
+- **Assessment (concept, edge cases, risk):** [`-worktable/docs/assessment/`](-worktable/docs/assessment)
 
 ## Quick start
 
