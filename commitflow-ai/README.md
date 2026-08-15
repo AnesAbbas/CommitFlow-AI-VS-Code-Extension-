@@ -111,22 +111,54 @@ Configure:
 
 ## 🚀 Getting Started
 
-1. Install **CommitFlow AI**.
-2. Configure your AI provider.
-3. Add your API key.
-4. Open a Git repository.
-5. Make some changes.
-6. Press **`Ctrl+Alt+S`**.
+### 1. Install CommitFlow AI
 
-That's it.
+Install the extension from the VS Code Marketplace, or via the Extensions view (`Ctrl+Shift+X`) by searching for **CommitFlow AI**.
 
-## ⌨️ Keyboard Shortcut
+### 2. Choose your AI provider
 
-| Command                     | Shortcut     |
-| --------------------------- | ------------ |
-| CommitFlow AI: Sync Changes | `Ctrl+Alt+S` |
+By default, CommitFlow AI uses **OpenRouter**. If that's fine, skip to step 3.
 
-You can change the shortcut through **Keyboard Shortcuts** in VS Code.
+To use **Amazon Bedrock** instead:
+
+1. Open **Settings** (`Ctrl+,`).
+2. Search for `commitflow-ai.provider`.
+3. Set it to `bedrock`.
+
+### 3. Add your API key
+
+1. Open the **Command Palette** (`Ctrl+Shift+P`).
+2. Run **`CommitFlow AI: Set API Key (for Active Provider)`**.
+3. Paste your key when prompted and press `Enter`.
+
+> The command reads whichever provider is set in step 2, so set the provider *before* adding the key. Your key is saved to VS Code's Secret Storage, not to your settings file.
+
+Where to get a key:
+
+* **OpenRouter** — create one at [openrouter.ai/keys](https://openrouter.ai/keys). It looks like `sk-or-v1-...`.
+* **Amazon Bedrock** — generate a Bedrock API key in the AWS Console (Bedrock → API keys). It looks like `ABSK...`. Also set `commitflow-ai.bedrockRegion` and `commitflow-ai.bedrockModel` in Settings if you're not using the defaults.
+
+Need to update or remove a key later? Run **`CommitFlow AI: Set API Key`** again to overwrite it, or **`CommitFlow AI: Clear API Key`** to delete it.
+
+### 4. Open a Git repository
+
+Open a folder in VS Code that's already a Git repository (`git init` if it isn't yet).
+
+### 5. Make some changes and sync
+
+Edit your files, then press **`Ctrl+Alt+S`**.
+
+CommitFlow AI pulls, stages, generates a commit message, commits, and pushes — automatically.
+
+## ⌨️ Commands & Shortcuts
+
+| Command                                              | Shortcut     | Description                                             |
+| ----------------------------------------------------- | ------------ | -------------------------------------------------------- |
+| `CommitFlow AI: Sync Changes`                          | `Ctrl+Alt+S` | Runs the full pull → commit → push workflow.             |
+| `CommitFlow AI: Set API Key (for Active Provider)`     | —            | Saves an API key for the currently selected provider.    |
+| `CommitFlow AI: Clear API Key (for Active Provider)`   | —            | Removes the saved API key for the currently selected provider. |
+
+All commands are available from the **Command Palette** (`Ctrl+Shift+P`). You can change the sync shortcut through **Keyboard Shortcuts** in VS Code.
 
 ## 🤖 OpenRouter
 
