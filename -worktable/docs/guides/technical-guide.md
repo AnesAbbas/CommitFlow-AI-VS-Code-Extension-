@@ -80,7 +80,7 @@ interpolation/injection surface and it works identically cross-platform.
   — never from `settings.json` or the package.
 - POSTs to `https://openrouter.ai/api/v1/chat/completions` with the model
   from `commitflow-ai.model` (default `openrouter/free`), `temperature: 0.1`,
-  `max_tokens: 80`.
+  `max_tokens: 200`.
 - The response body is read as text first, then `JSON.parse`d, so a non-JSON
   error body (HTML error page, empty body, etc.) surfaces as a clear "invalid
   JSON" error instead of an opaque parse exception. An in-body

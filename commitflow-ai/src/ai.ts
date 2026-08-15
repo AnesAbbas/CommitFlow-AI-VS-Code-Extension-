@@ -115,7 +115,7 @@ ${input}
                     }
                 ],
                 temperature: 0.1,
-                max_tokens: 80
+                max_tokens: 200
             })
         }
     );
