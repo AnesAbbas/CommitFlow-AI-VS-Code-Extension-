@@ -53,7 +53,7 @@
       "properties": {
         "commitflow-ai.model": {
           "type": "string",
-          "default": "openrouter/free",
+          "default": "~anthropic/claude-sonnet-latest",
           "description": "OpenRouter model used to generate commit messages."
         },
         "commitflow-ai.maxFullDiffBytes": {

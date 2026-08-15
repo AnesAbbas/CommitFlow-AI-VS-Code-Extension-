@@ -62,7 +62,7 @@ Ctrl + Alt + S
 
 | Setting | Default | Description |
 | --- | --- | --- |
-| `commitflow-ai.model` | `openrouter/free` | OpenRouter model used to generate commit messages. |
+| `commitflow-ai.model` | `~anthropic/claude-sonnet-latest` | OpenRouter model used to generate commit messages. |
 | `commitflow-ai.maxFullDiffBytes` | `40000` | Maximum staged diff size (bytes) sent as a full diff. |
 | `commitflow-ai.maxReducedDiffBytes` | `150000` | Maximum staged diff size (bytes) before switching to a structured summary. |
 | `commitflow-ai.commitStyle` | `conventional` | `conventional`, `simple`, or `descriptive`. |

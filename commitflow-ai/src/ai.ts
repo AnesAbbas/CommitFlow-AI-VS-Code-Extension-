@@ -44,7 +44,7 @@ export async function generateCommitMessage(
     const model =
         config.get<string>(
             "model",
-            "openrouter/free"
+            "~anthropic/claude-sonnet-latest"
         );
 
     const style =

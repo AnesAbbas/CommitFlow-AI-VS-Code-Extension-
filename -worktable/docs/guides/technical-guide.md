@@ -79,8 +79,8 @@ interpolation/injection surface and it works identically cross-platform.
 - Reads the API key from `context.secrets` (`commitflow-ai.openrouterApiKey`)
   — never from `settings.json` or the package.
 - POSTs to `https://openrouter.ai/api/v1/chat/completions` with the model
-  from `commitflow-ai.model` (default `openrouter/free`), `temperature: 0.1`,
-  `max_tokens: 200`.
+  from `commitflow-ai.model` (default `~anthropic/claude-sonnet-latest`),
+  `temperature: 0.1`, `max_tokens: 200`.
 - The response body is read as text first, then `JSON.parse`d, so a non-JSON
   error body (HTML error page, empty body, etc.) surfaces as a clear "invalid
   JSON" error instead of an opaque parse exception. An in-body
@@ -100,7 +100,7 @@ interpolation/injection surface and it works identically cross-platform.
 
 | Setting | Default | Purpose |
 | --- | --- | --- |
-| `commitflow-ai.model` | `openrouter/free` | OpenRouter model id. |
+| `commitflow-ai.model` | `~anthropic/claude-sonnet-latest` | OpenRouter model id. |
 | `commitflow-ai.maxFullDiffBytes` | `40000` | Full-diff cutoff. |
 | `commitflow-ai.maxReducedDiffBytes` | `150000` | Reduced-diff cutoff. |
 | `commitflow-ai.commitStyle` | `conventional` | Passed into the AI prompt. |
