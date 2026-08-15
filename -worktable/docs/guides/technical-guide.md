@@ -41,9 +41,10 @@ commitflow-ai/
    - otherwise → `--stat` + `--name-status` + `--numstat` only (no diff body),
      to keep large changes from blowing up the prompt / API cost.
 5. `getCommitMessage(context, aiInput)` — see fallback behavior below.
-6. Confirmation modal: **Commit & Push** / **Commit Only** / **Cancel**.
-7. `commit(cwd, message)`, then `push(cwd)` if the user chose "Commit & Push"
-   and `commitflow-ai.autoPush` is `true`.
+6. The generated commit message is shown as a non-blocking info
+   notification (no confirmation prompt — the sync proceeds automatically).
+7. `commit(cwd, message)`, then `push(cwd)` if `commitflow-ai.autoPush` is
+   `true` (default).
 
 ## Fallback commit message
 
@@ -57,8 +58,8 @@ commitflow-ai/
   - If the fallback string is non-empty (after trimming), a warning
     notification is shown with the failure reason, and
     `{ message: fallback, isFallback: true }` is returned — the sync
-    continues normally and the user still confirms the message before
-    anything is committed.
+    continues normally and commits (and pushes, per `autoPush`)
+    automatically using the fallback message.
   - If the fallback string is empty, the original error is re-thrown and
     surfaced via the top-level error handler in `runSync`, aborting the
     sync (previous behavior).

@@ -132,29 +132,7 @@ async function runSync(
                         ? `Commit message (fallback):\n\n${result.message}`
                         : `Commit message:\n\n${result.message}`;
 
-                const confirmed =
-                    await vscode.window.showInformationMessage(
-                        label,
-                        {
-                            modal: true
-                        },
-                        "Commit & Push",
-                        "Commit Only",
-                        "Cancel"
-                    );
-
-                if (
-                    confirmed === "Cancel" ||
-                    !confirmed
-                ) {
-                    vscode.window.showInformationMessage(
-                        "CommitFlow AI: Operation cancelled."
-                    );
-
-                    result = undefined;
-
-                    return;
-                }
+                vscode.window.showInformationMessage(label);
 
                 progress.report({
                     message: "Creating commit..."
@@ -170,10 +148,7 @@ async function runSync(
                         .getConfiguration("commitflow-ai")
                         .get<boolean>("autoPush", true);
 
-                if (
-                    confirmed === "Commit & Push" &&
-                    autoPush
-                ) {
+                if (autoPush) {
 
                     progress.report({
                         message: "Pushing changes..."

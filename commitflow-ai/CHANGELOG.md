@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Removed the commit/push confirmation dialog — `Ctrl+Alt+S` now commits
+  (and pushes, per `commitflow-ai.autoPush`) automatically, showing the
+  generated commit message as a notification instead of blocking on it.
+
 ## 0.0.1
 
 - Initial release: pull → stage → AI commit message (OpenRouter) → commit → push, bound to `Ctrl+Alt+S`.

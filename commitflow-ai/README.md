@@ -51,8 +51,11 @@ Ctrl + Alt + S
 - **Fallback commit message** — if AI generation fails for any reason (no API
   key configured, network error, rate limit, invalid response, etc.),
   CommitFlow AI uses a default commit message you configure in settings
-  instead of blocking the whole sync. You still get a confirmation dialog
-  before anything is committed.
+  instead of blocking the whole sync.
+- **No confirmation prompts** — the commit message is shown as a
+  notification for visibility, but CommitFlow AI commits (and pushes, if
+  `commitflow-ai.autoPush` is enabled) automatically without waiting for
+  approval.
 
 ## Commands
 
@@ -74,7 +77,7 @@ Ctrl + Alt + S
 | `commitflow-ai.maxReducedDiffBytes` | `150000` | Maximum staged diff size (bytes) before switching to a structured summary. |
 | `commitflow-ai.commitStyle` | `conventional` | `conventional`, `simple`, or `descriptive`. |
 | `commitflow-ai.maxCommitLength` | `72` | Maximum recommended commit message length. |
-| `commitflow-ai.autoPush` | `true` | Push after committing when "Commit & Push" is chosen. |
+| `commitflow-ai.autoPush` | `true` | Push automatically after committing. |
 | `commitflow-ai.fallbackCommitMessage` | `chore: update files` | Commit message used when AI generation fails. Set to an empty string to disable the fallback and surface the error instead. |
 
 ## Getting started
@@ -128,9 +131,9 @@ doesn't cover (e.g. a `.code-workspace` folder scope), move the value to
 If no API key is configured for the selected provider, or the request fails
 for any reason, CommitFlow AI does **not** stop the sync. Instead it uses
 the message from `commitflow-ai.fallbackCommitMessage` (default:
-`chore: update files`) and shows a warning notification explaining why. You
-still see the commit message in the confirmation dialog before it's used,
-and can cancel.
+`chore: update files`) and shows a warning notification explaining why,
+then commits (and pushes, per `commitflow-ai.autoPush`) automatically using
+that message.
 
 Set `commitflow-ai.fallbackCommitMessage` to an empty string if you'd rather
 have CommitFlow AI show an error and abort instead of falling back.
