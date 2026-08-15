@@ -109,8 +109,8 @@
         },
         "commitflow-ai.fallbackCommitMessage": {
           "type": "string",
-          "default": "chore: update files",
-          "description": "Commit message used when AI generation fails (missing/invalid API key, network error, rate limit, etc). Leave empty to disable the fallback and show an error instead.",
+          "default": "",
+          "description": "Optional commit message used if AI generation fails. Leave empty to stop instead of committing when AI generation fails.",
           "order": 7
         },
         "commitflow-ai.autoPush": {

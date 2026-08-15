@@ -212,7 +212,7 @@ async function getCommitMessage(
 
         const fallback =
             config
-                .get<string>("fallbackCommitMessage", "chore: update files")
+                .get<string>("fallbackCommitMessage", "")
                 .trim();
 
         if (!fallback) {

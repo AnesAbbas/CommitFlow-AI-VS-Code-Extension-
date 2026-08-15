@@ -71,9 +71,12 @@ commitflow-ai/
     surfaced via the top-level error handler in `runSync`, aborting the
     sync (previous behavior).
 
-This means an API key (for whichever provider is selected) is **optional**
-for `commitflow-ai.sync` to run at all — without one, every sync uses the
-fallback message unless the user clears `commitflow-ai.fallbackCommitMessage`.
+`commitflow-ai.fallbackCommitMessage` defaults to an empty string, so out of
+the box a missing/invalid API key or failed AI generation aborts the sync
+(previous behavior). An API key becomes **optional** for
+`commitflow-ai.sync` to run at all only once the user sets
+`commitflow-ai.fallbackCommitMessage` to a non-empty message — every sync
+then uses that fallback instead of aborting.
 
 ## Git access (`src/git.ts`)
 
@@ -137,7 +140,7 @@ declares an explicit numeric `order`; the table below lists settings in that
 | `commitflow-ai.bedrockModel` | `openai.gpt-oss-120b` | Bedrock model id (provider `bedrock`). |
 | `commitflow-ai.commitStyle` | `conventional` | Passed into the AI prompt. `conventional` (`type: short description`, e.g. `feat`/`fix`/`refactor`/etc.), `simple` (plain-language summary, no type prefix), or `descriptive` (longer explanatory summary). Each option's `enumDescriptions` entry in `package.json` is shown in the VS Code Settings UI. |
 | `commitflow-ai.maxCommitLength` | `72` | Enforced client-side after generation. |
-| `commitflow-ai.fallbackCommitMessage` | `chore: update files` | Used when AI generation fails; empty disables fallback. |
+| `commitflow-ai.fallbackCommitMessage` | *(empty)* | Used when AI generation fails; empty (default) aborts the sync instead of committing. |
 | `commitflow-ai.autoPush` | `true` | Gate on the push step. |
 | `commitflow-ai.maxFullDiffBytes` | `40000` | Full-diff cutoff. |
 | `commitflow-ai.maxReducedDiffBytes` | `150000` | Reduced-diff cutoff. |

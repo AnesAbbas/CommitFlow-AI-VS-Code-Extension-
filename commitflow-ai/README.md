@@ -78,7 +78,7 @@ Ctrl + Alt + S
 | `commitflow-ai.commitStyle` | `conventional` | `conventional` (`type: short description`, e.g. `feat: add dark mode toggle`), `simple` (plain-language summary, no type prefix, e.g. `add dark mode toggle`), or `descriptive` (longer explanatory summary with extra context). |
 | `commitflow-ai.maxCommitLength` | `72` | Maximum recommended commit message length. |
 | `commitflow-ai.autoPush` | `true` | Push automatically after committing. |
-| `commitflow-ai.fallbackCommitMessage` | `chore: update files` | Commit message used when AI generation fails. Set to an empty string to disable the fallback and surface the error instead. |
+| `commitflow-ai.fallbackCommitMessage` | *(empty)* | Optional commit message used if AI generation fails. Leave empty to stop instead of committing when AI generation fails. |
 
 ## Getting started
 
@@ -129,14 +129,14 @@ doesn't cover (e.g. a `.code-workspace` folder scope), move the value to
 ## Fallback behavior
 
 If no API key is configured for the selected provider, or the request fails
-for any reason, CommitFlow AI does **not** stop the sync. Instead it uses
-the message from `commitflow-ai.fallbackCommitMessage` (default:
-`chore: update files`) and shows a warning notification explaining why,
-then commits (and pushes, per `commitflow-ai.autoPush`) automatically using
-that message.
+for any reason, CommitFlow AI's behavior depends on
+`commitflow-ai.fallbackCommitMessage`, which is empty by default.
 
-Set `commitflow-ai.fallbackCommitMessage` to an empty string if you'd rather
-have CommitFlow AI show an error and abort instead of falling back.
+- **Empty (default):** CommitFlow AI shows an error and aborts instead of
+  committing.
+- **Set to a message:** CommitFlow AI does **not** stop the sync. Instead it
+  uses that message, shows a warning notification explaining why, then
+  commits (and pushes, per `commitflow-ai.autoPush`) automatically.
 
 ## Security
 

@@ -23,8 +23,7 @@ Then press `F5` in VS Code to launch the Extension Development Host, open a
 Git repository, and press `Ctrl+Alt+S`.
 
 An API key for the configured provider
-(`CommitFlow AI: Set API Key (for Active Provider)`) is optional: without
-one, commits use the configurable
-`commitflow-ai.fallbackCommitMessage` setting instead of an AI-generated
-message. Choose the provider via `commitflow-ai.provider`
-(`openrouter` or `bedrock`).
+(`CommitFlow AI: Set API Key (for Active Provider)`) is required for
+commits to succeed, unless `commitflow-ai.fallbackCommitMessage` is set to
+a non-empty message to use instead of an AI-generated one. Choose the
+provider via `commitflow-ai.provider` (`openrouter` or `bedrock`).
