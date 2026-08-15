@@ -1,10 +1,15 @@
 {
   "name": "commitflow-ai",
   "displayName": "CommitFlow AI",
-  "description": "AI-powered Git sync with smart commit messages using OpenRouter or Amazon Bedrock",
+  "description": "One keyboard shortcut to pull, stage, commit with an AI-generated message, and push your Git changes automatically.",
   "version": "0.0.1",
-  "publisher": "your-publisher-name",
+  "icon": "icon.png",
+  "publisher": "TreehouseTechLabs",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AnesAbbas/CommitFlow-AI-VS-Code-Extension-.git"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },
