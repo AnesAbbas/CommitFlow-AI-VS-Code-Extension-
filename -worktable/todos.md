@@ -2,7 +2,7 @@
 - [ ] at times genereating a message fails sayihng the ai returns empty message but repaeating it works 
 
 ![alt text](image.png)
-- [ ] 
+- [ ] at times message is not representative of the changes
 - [ ] 
 - [ ] 
 - [ ] 
